@@ -3,6 +3,7 @@ package com.example.workbookjwt2024.config;
 
 import com.example.workbookjwt2024.security.APIUserDetailsService;
 import com.example.workbookjwt2024.security.filter.APILoginFilter;
+import com.example.workbookjwt2024.security.handler.APILoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 @Configuration
 @Log4j2
@@ -53,14 +55,22 @@ public class CustomSecurityConfig {
         authenticationManagerBuilder.userDetailsService(apiUserDetailsService)
                 .passwordEncoder(passwordEncoder());
 
+        // AuthenticationManager
+        // Spring Security는 AuthenticationManager(ProviderManager)가 가지고 있는 provider 목록을 순회하면서
+        // provider 가 실행 가능한 경우에 provider의 authenticate 메서드를 호출하여 인증 절차를 수행한다.
+        // 사용자 ID/PW 를 인증하기 위해 적절한 AuthenticaitonProvider 를 찾아 처리를 위임한다.
+        // AuthenticationFilter 에 의해 AuthenticationManager가 동작한다.
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
-
         http.authenticationManager(authenticationManager);
 
         // APILoginFilter
         // http://localhost:8090/generateToken 호출시 filter실행 됨
         APILoginFilter apiLoginFilter = new APILoginFilter("/generateToken");
         apiLoginFilter.setAuthenticationManager(authenticationManager);
+
+        // APILoginSuccessHandler
+        APILoginSuccessHandler successHandler = new APILoginSuccessHandler();
+        apiLoginFilter.setAuthenticationSuccessHandler(successHandler);
 
         // APILoginFilter의 위치 조정
         http.addFilterBefore(apiLoginFilter, UsernamePasswordAuthenticationFilter.class);
