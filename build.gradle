@@ -38,6 +38,12 @@ dependencies {
 	implementation 'org.modelmapper:modelmapper:3.1.0'
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+
+	// test 코드에 대한 lombok 주입 ( test 시 log 에러 발생 때문에 - insertBoard() )
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	implementation 'com.google.code.gson:gson:2.8.9'
 }
 
 tasks.named('test') {
