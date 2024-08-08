@@ -3,6 +3,7 @@ package com.example.workbookjwt2024.config;
 
 import com.example.workbookjwt2024.security.APIUserDetailsService;
 import com.example.workbookjwt2024.security.filter.APILoginFilter;
+import com.example.workbookjwt2024.security.filter.TokenCheckFilter;
 import com.example.workbookjwt2024.security.handler.APILoginSuccessHandler;
 import com.example.workbookjwt2024.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,10 @@ public class CustomSecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    private TokenCheckFilter tokenCheckFilter(JWTUtil jwtUtil){
+        return new TokenCheckFilter(jwtUtil);
     }
 
     @Bean
@@ -77,6 +82,8 @@ public class CustomSecurityConfig {
         // APILoginFilter의 위치 조정
         http.addFilterBefore(apiLoginFilter, UsernamePasswordAuthenticationFilter.class);
 
+        // api로 시작하는 모든 경로는 TokenCheckFilter 동작
+        http.addFilterBefore(tokenCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);    // 세션 사용 안함

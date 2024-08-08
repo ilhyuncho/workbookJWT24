@@ -1,0 +1,6 @@
+1. http://localhost:8090/files/apiLogin.html
+   호출 후 토큰 생성
+
+2. http://localhost:8090/swagger-ui/index.html
+   접속 후 1에서 생성된 토큰으로 api 호출
+   ( Authorize 창에 "Bearer [토큰]" 을 입력 )
