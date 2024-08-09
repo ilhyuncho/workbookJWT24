@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <div clsss="result">
+
+  </div>
+
+  <button class="btn1">CALL SERVER</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+    const callServer = async() => {
+      console.log("call server 1..")
+
+      const accessToken = localStorage.getItem("accessToken")
+      if(!accessToken){
+        throw 'Cannot find Access Token'
+      }
+
+      // 'Authorization' 헤더로 전송
+      const authHeader = {"Authorization" : `Bearer ${accessToken}`}
+      try{
+        const res = await axios.get("http://localhost:8090/api/sample/doA",{headers:authHeader})
+        return res.data
+      }catch(err){
+          if(err.response.data.msg === 'Expired Token'){
+              console.log("Refresh your Token")
+              alert("Refresh your Token")
+
+              try{
+                  await callRefresh()   // refreshToken 호출
+                  console.log("new tokens......saved")
+                  return callServer()
+              }catch(refreshErr){
+                  throw refreshErr.response.data.msg
+              }
+
+              throw err.response.data.msg
+          }//end if
+      }
+
+
+    }
+
+    const resultDiv = document.querySelector(".result")
+
+    document.querySelector(".btn1").addEventListener("click", () =>{
+      callServer().then(result => {
+        console.log(result)
+      })
+    }, false)
+
+    const callRefresh = async () => {
+        const accessToken = localStorage.getItem("accessToken")
+        const refreshToken = localStorage.getItem("refreshToken")
+
+        const tokens = {accessToken, refreshToken}
+        const res = await axios.post("http://localhost:8090/refreshToken", tokens)
+
+        localStorage.setItem("accessToken", res.data.accessToken)
+        localStorage.setItem("refreshToken", res.data.refreshToken)
+    }
+  </script>
+
+
+</body>
+</html>
