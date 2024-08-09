@@ -14,7 +14,13 @@
       const data = {mid:"apiuser10", mpw:"1111"}
 
       axios.post("http://localhost:8090/generateToken", data).then(res => {
-          console.log(res.data.accessToken)
+          const accessToken = res.data.accessToken
+          const refreshToken = res.data.refreshToken
+
+          // Local Storage에 저장
+          localStorage.setItem("accessToken", accessToken)
+          localStorage.setItem("refreshToken", refreshToken)
+
       })
 
     },false)

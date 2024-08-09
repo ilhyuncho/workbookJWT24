@@ -28,9 +28,12 @@ public class TokenCheckFilter extends OncePerRequestFilter  {   // 하나의 요
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        log.error("Token Check filter start................");
+
         String path = request.getRequestURI();
 
         if(!path.startsWith("/api/")){
+            log.error("Token Check filter is not................");
             filterChain.doFilter(request, response);
             return;
         }
@@ -39,6 +42,7 @@ public class TokenCheckFilter extends OncePerRequestFilter  {   // 하나의 요
 
         try{
             validateAccessToken(request);
+
             filterChain.doFilter(request, response);
         }catch(AccessTokenException accessTokenException){
             accessTokenException.sendResonseError(response);

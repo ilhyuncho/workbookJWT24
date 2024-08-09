@@ -3,6 +3,7 @@ package com.example.workbookjwt2024.config;
 
 import com.example.workbookjwt2024.security.APIUserDetailsService;
 import com.example.workbookjwt2024.security.filter.APILoginFilter;
+import com.example.workbookjwt2024.security.filter.RefreshTokenFilter;
 import com.example.workbookjwt2024.security.filter.TokenCheckFilter;
 import com.example.workbookjwt2024.security.handler.APILoginSuccessHandler;
 import com.example.workbookjwt2024.util.JWTUtil;
@@ -84,6 +85,10 @@ public class CustomSecurityConfig {
 
         // api로 시작하는 모든 경로는 TokenCheckFilter 동작
         http.addFilterBefore(tokenCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
+        // refreshToken -> TokenCheckFilter
+        http.addFilterBefore(new RefreshTokenFilter("/refreshToken", jwtUtil), TokenCheckFilter.class);
+
 
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);    // 세션 사용 안함
